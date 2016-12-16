@@ -1,0 +1,12 @@
+{
+    "name": "okamos/php-ses",
+    "description": "amazon,aws,ses",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "okamos",
+            "email": "himinato.k@gmail.com"
+        }
+    ],
+    "require": {}
+}
