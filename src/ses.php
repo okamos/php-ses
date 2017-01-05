@@ -1,4 +1,9 @@
 <?php
+/*
+ * Amazon SimpleEmailService class for PHP
+ * Author: Okamos
+ *
+ */
 class SimpleEmailService {
   const SERVICE = 'email';
   const DOMAIN = 'amazonaws.com';
@@ -21,6 +26,8 @@ class SimpleEmailService {
   private $headers;
   private $query_parameters;
 
+  // aws_access_key_id and aws_secret_access_key is reuqired.
+  // Defaults verification of SSL certificate used.
   public function __construct($credentials = array(), $enabled_ssl_verify_peer = true) {
     $this -> aws_key = $credentials['aws_access_key_id'];
     $this -> aws_secret = $credentials['aws_secret_access_key'];
@@ -36,6 +43,7 @@ class SimpleEmailService {
     $this -> ssl_verify = $enabled_ssl_verify_peer;
   }
 
+  // List all identities your AWS account.
   public function list_identities($identity_type = 'EmailAddress') {
     $this -> action = 'ListIdentities';
     $this -> method = 'GET';
@@ -60,6 +68,7 @@ class SimpleEmailService {
     }
   }
 
+  // Send an confirmation email to email address for verification.
   public function verify_email_identity($email) {
     $this -> action = 'VerifyEmailIdentity';
     $this -> method = 'GET';
@@ -84,6 +93,7 @@ class SimpleEmailService {
     }
   }
 
+  // Delete an identity from your AWS account.
   public function delete_identity($identity) {
     $this -> action = 'DeleteIdentity';
     $this -> method = 'GET';
@@ -107,6 +117,8 @@ class SimpleEmailService {
     }
   }
 
+  // TODO: send raw message
+  // Send the email to some specified addresses.
   public function send_email($assets = array()) {
     $this -> action = 'SendEmail';
     $this -> method = 'POST';
@@ -151,6 +163,7 @@ class SimpleEmailService {
     }
   }
 
+  // Get your AWS account's sending limits.
   public function get_send_quota() {
     $this -> action = 'GetSendQuota';
     $this -> method = 'GET';
@@ -166,6 +179,7 @@ class SimpleEmailService {
     }
   }
 
+  // Get SES sending statistics.
   public function get_send_statistics() {
     $this -> action = 'GetSendStatistics';
     $this -> method = 'GET';
@@ -206,6 +220,8 @@ class SimpleEmailService {
     return $signing_h;
   }
 
+  // Signing AWS Requests with Signature Version 4
+	// see http://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html
   private function generate_signature($parameters = array()) {
     $canonical_uri = '/';
 
@@ -218,6 +234,7 @@ class SimpleEmailService {
     $signed_headers = 'host;x-amz-date';
     $payload_hash = hash('sha256', '');
 
+    # task1
     $canonical_request = $this -> method . "\n" . $canonical_uri . "\n" . $request_parameters . "\n" . $canonical_headers . "\n" . $signed_headers . "\n" . $payload_hash;
 
     # task2
