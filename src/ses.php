@@ -166,6 +166,21 @@ class SimpleEmailService {
     }
   }
 
+  public function get_send_statistics() {
+    $this -> action = 'GetSendStatistics';
+    $this -> method = 'GET';
+
+
+    $this -> generate_signature();
+    $context = $this -> create_stream_context();
+    if ($res = @file_get_contents($this -> endpoint . '?' . $this -> query_parameters, false, $context)) {
+      $xml = simplexml_load_string($res);
+      return $xml -> GetSendStatisticsResult -> SendDataPoints -> member;
+    } else {
+      error_log(self::ERROR);
+    }
+  }
+
   private function create_stream_context() {
     $opts = array(
       'ssl' => array(
