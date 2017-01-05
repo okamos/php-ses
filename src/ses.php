@@ -41,7 +41,7 @@ class SimpleEmailService {
     $this -> method = 'GET';
 
     if (!preg_match('/EmailAddress|Domain/', $identity_type)) {
-      error_log('IdentityType must EmailAddress or Domain');
+      error_log('IdentityType must be EmailAddress or Domain');
       return;
     }
 
@@ -81,6 +81,29 @@ class SimpleEmailService {
     } else {
       error_log(self::ERROR);
       return;
+    }
+  }
+
+  public function delete_identity($identity) {
+    $this -> action = 'DeleteIdentity';
+    $this -> method = 'GET';
+
+    if (!(filter_var($identity, FILTER_VALIDATE_EMAIL) || preg_match('/^([a-z\d]+(-[a-z\d]+)*\.)+[a-z]{2,}$/', $identity))) {
+      error_log('Identity must be EmailAddress or Domain');
+      return;
+    }
+
+    $parameters = array(
+      'Identity' => $identity
+    );
+
+    $this -> generate_signature($parameters);
+    $context = $this -> create_stream_context();
+    if ($res = @file_get_contents($this -> endpoint . '?' . $this -> query_parameters, false, $context)) {
+      $xml = simplexml_load_string($res);
+      return $xml -> ResponseMetadata -> RequestId;
+    } else {
+      error_log(self::ERROR);
     }
   }
 
