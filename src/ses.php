@@ -60,6 +60,30 @@ class SimpleEmailService {
     }
   }
 
+  public function verify_email_identity($email) {
+    $this -> action = 'VerifyEmailIdentity';
+    $this -> method = 'GET';
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      error_log('Invalid email');
+      return;
+    }
+
+    $parameters = array(
+      'EmailAddress' => $email
+    );
+
+    $this -> generate_signature($parameters);
+    $context = $this -> create_stream_context();
+    if ($res = @file_get_contents($this -> endpoint . '?' . $this -> query_parameters, false, $context)) {
+      $xml = simplexml_load_string($res);
+      return $xml -> ResponseMetadata -> RequestId;
+    } else {
+      error_log(self::ERROR);
+      return;
+    }
+  }
+
   public function send_email($assets = array()) {
     $this -> action = 'SendEmail';
     $this -> method = 'POST';
