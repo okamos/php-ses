@@ -131,7 +131,6 @@ class SimpleEmailService {
   private function create_stream_context() {
     $opts = array(
       'ssl' => array(
-        // this is not recomend.
         'verify_peer' => $this -> ssl_verify,
         'verify_peer_name' => $this -> ssl_verify
       ),
