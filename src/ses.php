@@ -55,6 +55,50 @@ class SimpleEmailService {
     }
   }
 
+  public function send_email($assets = array()) {
+    $this -> action = 'SendEmail';
+    $this -> method = 'POST';
+
+    $parameters = array(
+      'Message.Body.Text.Data' => $assets['body'],
+      'Message.Subject.Data' => $assets['subject'],
+      'Source' => $assets['from']
+    );
+
+    $address_index = 1;
+    if (isset($assets['to']) && is_array($assets['to'])) {
+      foreach ($assets['to'] as $address) {
+        $parameters['Destination.ToAddresses.member.' . $address_index] = $address;
+        $address_index++;
+      }
+    }
+
+    if (isset($assets['cc']) && is_array($assets['cc'])) {
+      $address_index = 1;
+      foreach ($assets['cc'] as $address) {
+        $parameters['Destination.CcAddresses.member.' . $address_index] = $address;
+        $address_index++;
+      }
+    }
+
+    if (isset($assets['bcc']) && is_array($assets['bcc'])) {
+      $address_index = 1;
+      foreach ($assets['bcc'] as $address) {
+        $parameters['Destination.BccAddresses.member.' . $address_index] = $address;
+        $address_index++;
+      }
+    }
+
+    $this -> generate_signature($parameters);
+    $context = $this -> create_stream_context();
+    if ($res = @file_get_contents($this -> endpoint . '?' . $this -> query_parameters, false, $context)) {
+      $xml = simplexml_load_string($res);
+      return $xml -> SendEmailResult -> MessageId;
+    } else {
+      error_log(self::ERROR);
+    }
+  }
+
   private function create_stream_context() {
     $opts = array(
       'ssl' => array(
