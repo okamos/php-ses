@@ -40,6 +40,11 @@ class SimpleEmailService {
     $this -> action = 'ListIdentities';
     $this -> method = 'GET';
 
+    if (!preg_match('/EmailAddress|Domain/', $identity_type)) {
+      error_log('IdentityType must EmailAddress or Domain');
+      return;
+    }
+
     $parameters = array(
       'IdentityType' => $identity_type
     );
@@ -51,7 +56,7 @@ class SimpleEmailService {
       return $identities -> ListIdentitiesResult -> Identities -> member;
     } else {
       error_log(self::ERROR);
-      return array();
+      return;
     }
   }
 
