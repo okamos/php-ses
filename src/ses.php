@@ -151,6 +151,21 @@ class SimpleEmailService {
     }
   }
 
+  public function get_send_quota() {
+    $this -> action = 'GetSendQuota';
+    $this -> method = 'GET';
+
+
+    $this -> generate_signature();
+    $context = $this -> create_stream_context();
+    if ($res = @file_get_contents($this -> endpoint . '?' . $this -> query_parameters, false, $context)) {
+      $xml = simplexml_load_string($res);
+      return $xml -> GetSendQuotaResult;
+    } else {
+      error_log(self::ERROR);
+    }
+  }
+
   private function create_stream_context() {
     $opts = array(
       'ssl' => array(
@@ -176,7 +191,7 @@ class SimpleEmailService {
     return $signing_h;
   }
 
-  private function generate_signature($parameters) {
+  private function generate_signature($parameters = array()) {
     $canonical_uri = '/';
 
     $parameters['Action'] = $this -> action;
