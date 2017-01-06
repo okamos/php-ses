@@ -67,7 +67,7 @@ class SimpleEmailService {
       $identities = new SimpleXMLElement($res);
       return $identities -> ListIdentitiesResult -> Identities -> member;
     } else {
-      error_log(self::ERROR);
+      throw new Exception(self::ERROR);
       return;
     }
   }
@@ -78,7 +78,7 @@ class SimpleEmailService {
     $this -> method = 'GET';
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-      error_log('Invalid email');
+      throw new Exception('Invalid email');
       return;
     }
 
@@ -92,7 +92,7 @@ class SimpleEmailService {
       $xml = simplexml_load_string($res);
       return $xml -> ResponseMetadata -> RequestId;
     } else {
-      error_log(self::ERROR);
+      throw new Exception(self::ERROR);
       return;
     }
   }
@@ -103,7 +103,7 @@ class SimpleEmailService {
     $this -> method = 'GET';
 
     if (!(filter_var($identity, FILTER_VALIDATE_EMAIL) || preg_match('/^([a-z\d]+(-[a-z\d]+)*\.)+[a-z]{2,}$/', $identity))) {
-      error_log('Identity must be EmailAddress or Domain');
+      throw new Exception('Identity must be EmailAddress or Domain');
       return;
     }
 
@@ -117,7 +117,7 @@ class SimpleEmailService {
       $xml = simplexml_load_string($res);
       return $xml -> ResponseMetadata -> RequestId;
     } else {
-      error_log(self::ERROR);
+      throw new Exception(self::ERROR);
     }
   }
 
@@ -163,7 +163,7 @@ class SimpleEmailService {
       $xml = simplexml_load_string($res);
       return $xml -> SendEmailResult -> MessageId;
     } else {
-      error_log(self::ERROR);
+      throw new Exception(self::ERROR);
     }
   }
 
@@ -179,7 +179,7 @@ class SimpleEmailService {
       $xml = simplexml_load_string($res);
       return $xml -> GetSendQuotaResult;
     } else {
-      error_log(self::ERROR);
+      throw new Exception(self::ERROR);
     }
   }
 
@@ -195,7 +195,7 @@ class SimpleEmailService {
       $xml = simplexml_load_string($res);
       return $xml -> GetSendStatisticsResult -> SendDataPoints -> member;
     } else {
-      error_log(self::ERROR);
+      throw new Exception(self::ERROR);
     }
   }
 
