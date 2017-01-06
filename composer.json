@@ -1,12 +1,20 @@
 {
     "name": "okamos/php-ses",
-    "description": "amazon,aws,ses",
+    "description": "An Amazon SES api for PHP. Support signature version 4",
+    "keywords": ["amazon", "aws", "ses", "api"],
+    "homepage": "https://github.com/okamos/php-ses",
     "license": "MIT",
+    "type": "library",
     "authors": [
         {
             "name": "okamos",
-            "email": "himinato.k@gmail.com"
+            "email": "okamoto@okamos.com"
         }
     ],
-    "require": {}
+    "autoload": {
+      "classmap": ["src/"]
+    },
+    "require": {
+      "php": "^5.5 || ^7.0"
+    }
 }
