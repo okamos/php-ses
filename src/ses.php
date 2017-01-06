@@ -44,18 +44,22 @@ class SimpleEmailService {
   }
 
   // List all identities your AWS account.
-  public function list_identities($identity_type = 'EmailAddress') {
+  public function list_identities($identity_type = '') {
     $this -> action = 'ListIdentities';
     $this -> method = 'GET';
 
-    if (!preg_match('/EmailAddress|Domain/', $identity_type)) {
-      error_log('IdentityType must be EmailAddress or Domain');
+    if (!preg_match('/^(EmailAddress|Domain|)$/', $identity_type)) {
+      throw new Exception('IdentityType must be EmailAddress or Domain');
       return;
     }
 
-    $parameters = array(
-      'IdentityType' => $identity_type
-    );
+    if ($identity_type) {
+      $parameters = array(
+        'IdentityType' => $identity_type
+      );
+    } else {
+      $parameters = array();
+    }
 
     $this -> generate_signature($parameters);
     $context = $this -> create_stream_context();
