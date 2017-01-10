@@ -63,10 +63,8 @@ class SimpleEmailService {
     if ($res = @file_get_contents($this -> endpoint . '?' . $this -> query_parameters, false, $context)) {
       $identities = new SimpleXMLElement($res);
       return $identities -> ListIdentitiesResult -> Identities -> member;
-    } else {
-      throw new Exception(self::ERROR);
-      return;
     }
+    throw new Exception(self::ERROR);
   }
 
   // Send an confirmation email to email address for verification.
@@ -88,10 +86,8 @@ class SimpleEmailService {
     if ($res = @file_get_contents($this -> endpoint . '?' . $this -> query_parameters, false, $context)) {
       $xml = simplexml_load_string($res);
       return $xml -> ResponseMetadata -> RequestId;
-    } else {
-      throw new Exception(self::ERROR);
-      return;
     }
+    throw new Exception(self::ERROR);
   }
 
   // Delete an identity from your AWS account.
@@ -113,9 +109,8 @@ class SimpleEmailService {
     if ($res = @file_get_contents($this -> endpoint . '?' . $this -> query_parameters, false, $context)) {
       $xml = simplexml_load_string($res);
       return $xml -> ResponseMetadata -> RequestId;
-    } else {
-      throw new Exception(self::ERROR);
     }
+    throw new Exception(self::ERROR);
   }
 
   // TODO: send raw message
@@ -145,9 +140,8 @@ class SimpleEmailService {
     if ($res = @file_get_contents($this -> endpoint . '?' . $this -> query_parameters, false, $context)) {
       $xml = simplexml_load_string($res);
       return $xml -> SendEmailResult -> MessageId;
-    } else {
-      throw new Exception(self::ERROR);
     }
+    throw new Exception(self::ERROR);
   }
 
   public function addAddresses($addresses, $destination = 'to') {
@@ -174,9 +168,8 @@ class SimpleEmailService {
     if ($res = @file_get_contents($this -> endpoint . '?' . $this -> query_parameters, false, $context)) {
       $xml = simplexml_load_string($res);
       return $xml -> GetSendQuotaResult;
-    } else {
-      throw new Exception(self::ERROR);
     }
+    throw new Exception(self::ERROR);
   }
 
   // Get SES sending statistics.
@@ -190,9 +183,8 @@ class SimpleEmailService {
     if ($res = @file_get_contents($this -> endpoint . '?' . $this -> query_parameters, false, $context)) {
       $xml = simplexml_load_string($res);
       return $xml -> GetSendStatisticsResult -> SendDataPoints -> member;
-    } else {
-      throw new Exception(self::ERROR);
     }
+    throw new Exception(self::ERROR);
   }
 
   private function create_stream_context() {
