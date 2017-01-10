@@ -28,7 +28,7 @@ class SimpleEmailService {
 
   // aws_access_key_id and aws_secret_access_key is reuqired.
   // Defaults verification of SSL certificate used.
-  public function __construct($credentials = array(), $enabled_ssl_verify_peer = true) {
+  public function __construct($credentials = array(), $ssl_verify_peer = true) {
     $this -> aws_key = $credentials['aws_access_key_id'];
     $this -> aws_secret = $credentials['aws_secret_access_key'];
     // default is us-east-1
@@ -40,7 +40,7 @@ class SimpleEmailService {
     $this -> amz_date = gmdate('Ymd\THis\Z');
     $this -> date = gmdate('Ymd');
 
-    $this -> ssl_verify = $enabled_ssl_verify_peer;
+    $this -> ssl_verify = $ssl_verify_peer;
   }
 
   // List all identities your AWS account.
@@ -53,12 +53,9 @@ class SimpleEmailService {
       return;
     }
 
+    $parameters = array();
     if ($identity_type) {
-      $parameters = array(
-        'IdentityType' => $identity_type
-      );
-    } else {
-      $parameters = array();
+      $parameters['IdentityType'] = $identity_type;
     }
 
     $this -> generate_signature($parameters);
@@ -133,28 +130,14 @@ class SimpleEmailService {
       'Source' => $assets['from']
     );
 
-    $address_index = 1;
-    if (isset($assets['to']) && is_array($assets['to'])) {
-      foreach ($assets['to'] as $address) {
-        $parameters['Destination.ToAddresses.member.' . $address_index] = $address;
-        $address_index++;
-      }
+    if (isset($asset['to'])) {
+      $this -> addAddresses($assets['to']);
     }
-
-    if (isset($assets['cc']) && is_array($assets['cc'])) {
-      $address_index = 1;
-      foreach ($assets['cc'] as $address) {
-        $parameters['Destination.CcAddresses.member.' . $address_index] = $address;
-        $address_index++;
-      }
+    if (isset($asset['cc'])) {
+      $this -> addAddresses($assets['cc'], 'cc');
     }
-
-    if (isset($assets['bcc']) && is_array($assets['bcc'])) {
-      $address_index = 1;
-      foreach ($assets['bcc'] as $address) {
-        $parameters['Destination.BccAddresses.member.' . $address_index] = $address;
-        $address_index++;
-      }
+    if (isset($asset['bcc'])) {
+      $this -> addAddresses($assets['bcc'], 'bcc');
     }
 
     $this -> generate_signature($parameters);
@@ -164,6 +147,19 @@ class SimpleEmailService {
       return $xml -> SendEmailResult -> MessageId;
     } else {
       throw new Exception(self::ERROR);
+    }
+  }
+
+  public function addAddresses($addresses, $destination = 'to') {
+    $address_index = 1;
+    if (is_string($addresses)) {
+      $parameters['Destination.' . $destination . 'Addresses.member.' . $address_index] = $addresses;
+    }
+    if (is_array($addresses)) {
+      foreach ($addresses as $address) {
+        $parameters['Destination.' . $destination . 'Addresses.member.' . $address_index] = $address;
+        $address_index++;
+      }
     }
   }
 
