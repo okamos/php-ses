@@ -43,18 +43,18 @@ class SimpleEmailService
      */
     public function __construct($credentials = array(), $ssl_verify_peer = true)
     {
-        $this -> _aws_key = $credentials['aws_access_key_id'];
-        $this -> _aws_secret = $credentials['aws_secret_access_key'];
+        $this->_aws_key = $credentials['aws_access_key_id'];
+        $this->_aws_secret = $credentials['aws_secret_access_key'];
         // default is us-east-1
-        $this -> _region = $credentials['region'] ? $credentials['region'] : 'us-east-1';
+        $this->_region = $credentials['region'] ? $credentials['region'] : 'us-east-1';
 
-        $this -> _host = self::SERVICE . '.' . $this -> _region . '.' . self::DOMAIN;
-        $this -> _endpoint = 'https://' . self::SERVICE . '.' . $this -> _region . '.' . self::DOMAIN;
+        $this->_host = self::SERVICE . '.' . $this->_region . '.' . self::DOMAIN;
+        $this->_endpoint = 'https://' . self::SERVICE . '.' . $this->_region . '.' . self::DOMAIN;
 
-        $this -> _amz_date = gmdate('Ymd\THis\Z');
-        $this -> _date = gmdate('Ymd');
+        $this->_amz_date = gmdate('Ymd\THis\Z');
+        $this->_date = gmdate('Ymd');
 
-        $this -> ssl_verify = $ssl_verify_peer;
+        $this->ssl_verify = $ssl_verify_peer;
     }
 
     /**
@@ -69,8 +69,8 @@ class SimpleEmailService
      */
     public function listIdentities($identity_type = '')
     {
-        $this -> _action = 'ListIdentities';
-        $this -> _method = 'GET';
+        $this->_action = 'ListIdentities';
+        $this->_method = 'GET';
 
         if (!preg_match('/^(EmailAddress|Domain|)$/', $identity_type)) {
             throw new Exception('IdentityType must be EmailAddress or Domain');
@@ -82,11 +82,11 @@ class SimpleEmailService
             $parameters['IdentityType'] = $identity_type;
         }
 
-        $this -> _generateSignature($parameters);
-        $context = $this -> _createStreamContext();
-        if ($res = @file_get_contents($this -> _endpoint . '?' . $this -> _query_parameters, false, $context)) {
+        $this->_generateSignature($parameters);
+        $context = $this->_createStreamContext();
+        if ($res = @file_get_contents($this->_endpoint . '?' . $this->_query_parameters, false, $context)) {
             $identities = new SimpleXMLElement($res);
-            return $identities -> ListIdentitiesResult -> Identities -> member;
+            return $identities->ListIdentitiesResult->Identities->member;
         }
         throw new Exception(self::ERROR);
     }
@@ -100,8 +100,8 @@ class SimpleEmailService
      */
     public function verifyEmailIdentity($email)
     {
-        $this -> _action = 'VerifyEmailIdentity';
-        $this -> _method = 'GET';
+        $this->_action = 'VerifyEmailIdentity';
+        $this->_method = 'GET';
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new Exception('Invalid email');
@@ -112,11 +112,11 @@ class SimpleEmailService
             'EmailAddress' => $email
         );
 
-        $this -> _generateSignature($parameters);
-        $context = $this -> _createStreamContext();
-        if ($res = @file_get_contents($this -> _endpoint . '?' . $this -> _query_parameters, false, $context)) {
+        $this->_generateSignature($parameters);
+        $context = $this->_createStreamContext();
+        if ($res = @file_get_contents($this->_endpoint . '?' . $this->_query_parameters, false, $context)) {
             $xml = simplexml_load_string($res);
-            return $xml -> ResponseMetadata -> RequestId;
+            return $xml->ResponseMetadata->RequestId;
         }
         throw new Exception(self::ERROR);
     }
@@ -131,8 +131,8 @@ class SimpleEmailService
      */
     public function deleteIdentity($identity)
     {
-        $this -> _action = 'DeleteIdentity';
-        $this -> _method = 'GET';
+        $this->_action = 'DeleteIdentity';
+        $this->_method = 'GET';
 
         if (!(filter_var($identity, FILTER_VALIDATE_EMAIL) || preg_match('/^([a-z\d]+(-[a-z\d]+)*\.)+[a-z]{2,}$/', $identity))) {
             throw new Exception('Identity must be EmailAddress or Domain');
@@ -143,11 +143,11 @@ class SimpleEmailService
             'Identity' => $identity
         );
 
-        $this -> _generateSignature($parameters);
-        $context = $this -> _createStreamContext();
-        if ($res = @file_get_contents($this -> _endpoint . '?' . $this -> _query_parameters, false, $context)) {
+        $this->_generateSignature($parameters);
+        $context = $this->_createStreamContext();
+        if ($res = @file_get_contents($this->_endpoint . '?' . $this->_query_parameters, false, $context)) {
             $xml = simplexml_load_string($res);
-            return $xml -> ResponseMetadata -> RequestId;
+            return $xml->ResponseMetadata->RequestId;
         }
         throw new Exception(self::ERROR);
     }
@@ -165,8 +165,8 @@ class SimpleEmailService
      */
     public function sendEmail($assets = array())
     {
-        $this -> _action = 'SendEmail';
-        $this -> _method = 'POST';
+        $this->_action = 'SendEmail';
+        $this->_method = 'POST';
 
         $parameters = array(
             'Message.Body.Text.Data' => $assets['body'],
@@ -175,20 +175,20 @@ class SimpleEmailService
         );
 
         if (isset($asset['to'])) {
-            $this -> addAddresses($assets['to']);
+            $this->addAddresses($assets['to']);
         }
         if (isset($asset['cc'])) {
-            $this -> addAddresses($assets['cc'], 'cc');
+            $this->addAddresses($assets['cc'], 'cc');
         }
         if (isset($asset['bcc'])) {
-            $this -> addAddresses($assets['bcc'], 'bcc');
+            $this->addAddresses($assets['bcc'], 'bcc');
         }
 
-        $this -> _generateSignature($parameters);
-        $context = $this -> _createStreamContext();
-        if ($res = @file_get_contents($this -> _endpoint . '?' . $this -> _query_parameters, false, $context)) {
+        $this->_generateSignature($parameters);
+        $context = $this->_createStreamContext();
+        if ($res = @file_get_contents($this->_endpoint . '?' . $this->_query_parameters, false, $context)) {
             $xml = simplexml_load_string($res);
-            return $xml -> SendEmailResult -> MessageId;
+            return $xml->SendEmailResult->MessageId;
         }
         throw new Exception(self::ERROR);
     }
@@ -223,14 +223,14 @@ class SimpleEmailService
      */
     public function getSendQuota()
     {
-        $this -> _action = 'GetSendQuota';
-        $this -> _method = 'GET';
+        $this->_action = 'GetSendQuota';
+        $this->_method = 'GET';
 
-        $this -> _generateSignature();
-        $context = $this -> _createStreamContext();
-        if ($res = @file_get_contents($this -> _endpoint . '?' . $this -> _query_parameters, false, $context)) {
+        $this->_generateSignature();
+        $context = $this->_createStreamContext();
+        if ($res = @file_get_contents($this->_endpoint . '?' . $this->_query_parameters, false, $context)) {
             $xml = simplexml_load_string($res);
-            return $xml -> GetSendQuotaResult;
+            return $xml->GetSendQuotaResult;
         }
         throw new Exception(self::ERROR);
     }
@@ -242,14 +242,14 @@ class SimpleEmailService
      */
     public function getSendStatistics()
     {
-        $this -> _action = 'GetSendStatistics';
-        $this -> _method = 'GET';
+        $this->_action = 'GetSendStatistics';
+        $this->_method = 'GET';
 
-        $this -> _generateSignature();
-        $context = $this -> _createStreamContext();
-        if ($res = @file_get_contents($this -> _endpoint . '?' . $this -> _query_parameters, false, $context)) {
+        $this->_generateSignature();
+        $context = $this->_createStreamContext();
+        if ($res = @file_get_contents($this->_endpoint . '?' . $this->_query_parameters, false, $context)) {
             $xml = simplexml_load_string($res);
-            return $xml -> GetSendStatisticsResult -> SendDataPoints -> member;
+            return $xml->GetSendStatisticsResult->SendDataPoints->member;
         }
         throw new Exception(self::ERROR);
     }
@@ -263,12 +263,12 @@ class SimpleEmailService
     {
         $opts = array(
             'ssl' => array(
-                'verify_peer' => $this -> ssl_verify,
-                'verify_peer_name' => $this -> ssl_verify
+                'verify_peer' => $this->ssl_verify,
+                'verify_peer_name' => $this->ssl_verify
             ),
             'http' => array(
-                'method' => $this -> _method,
-                'header' => join("\n", $this -> _headers) . "\n"
+                'method' => $this->_method,
+                'header' => join("\n", $this->_headers) . "\n"
             )
         );
 
@@ -282,8 +282,8 @@ class SimpleEmailService
      */
     private function _generateSignatureKey()
     {
-        $date_h = hash_hmac('sha256', $this -> _date, 'AWS4' . $this -> _aws_secret, true);
-        $region_h = hash_hmac('sha256', $this -> _region, $date_h, true);
+        $date_h = hash_hmac('sha256', $this->_date, 'AWS4' . $this->_aws_secret, true);
+        $region_h = hash_hmac('sha256', $this->_region, $date_h, true);
         $service_h = hash_hmac('sha256', self::SERVICE, $region_h, true);
         $signing_h = hash_hmac('sha256', 'aws4_request', $service_h, true);
 
@@ -303,28 +303,28 @@ class SimpleEmailService
     {
         $canonical_uri = '/';
 
-        $parameters['Action'] = $this -> _action;
+        $parameters['Action'] = $this->_action;
         ksort($parameters);
 
         $request_parameters = http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
 
-        $canonical_headers = 'host:' . $this -> _host . "\n" . 'x-amz-date:' . $this -> _amz_date . "\n";
+        $canonical_headers = 'host:' . $this->_host . "\n" . 'x-amz-date:' . $this->_amz_date . "\n";
         $signed_headers = 'host;x-amz-date';
         $payload_hash = hash('sha256', '');
 
         // task1
-        $canonical_request = $this -> _method . "\n" . $canonical_uri . "\n" . $request_parameters . "\n" . $canonical_headers . "\n" . $signed_headers . "\n" . $payload_hash;
+        $canonical_request = $this->_method . "\n" . $canonical_uri . "\n" . $request_parameters . "\n" . $canonical_headers . "\n" . $signed_headers . "\n" . $payload_hash;
 
         // task2
-        $credential_scope = $this -> _date . '/' . $this -> _region . '/' . self::SERVICE . '/aws4_request';
-        $string_to_sign =  self::ALGORITHM . "\n" . $this -> _amz_date . "\n" . $credential_scope . "\n" . hash('sha256', $canonical_request);
+        $credential_scope = $this->_date . '/' . $this->_region . '/' . self::SERVICE . '/aws4_request';
+        $string_to_sign =  self::ALGORITHM . "\n" . $this->_amz_date . "\n" . $credential_scope . "\n" . hash('sha256', $canonical_request);
 
         // task3
-        $signing_key = $this -> _generateSignatureKey();
+        $signing_key = $this->_generateSignatureKey();
         $signature = hash_hmac('sha256', $string_to_sign, $signing_key);
-        $this -> _headers[] = 'Authorization:' . self::ALGORITHM . ' Credential=' . $this -> _aws_key . '/' . $credential_scope . ', SignedHeaders=' . $signed_headers . ', Signature=' . $signature;
-        $this -> _headers[] = 'x-amz-date:' . $this -> _amz_date;
-        $this -> _query_parameters = $request_parameters;
+        $this->_headers[] = 'Authorization:' . self::ALGORITHM . ' Credential=' . $this->_aws_key . '/' . $credential_scope . ', SignedHeaders=' . $signed_headers . ', Signature=' . $signature;
+        $this->_headers[] = 'x-amz-date:' . $this->_amz_date;
+        $this->_query_parameters = $request_parameters;
     }
 }
 ?>
