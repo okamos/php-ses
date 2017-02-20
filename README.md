@@ -1,4 +1,6 @@
 # Amazon Simple Email Service for PHP
+[![Travis](https://travis-ci.org/okamos/php-ses.svg?branch=master)]()
+[![license](https://img.shields.io/github/license/okamos/php-ses.svg)]()
 php-ses is a PHP library for Amazon's Simple Email Service's REST API [Amazon SES](https://aws.amazon.com/ses/)
 
 ## Getting started
