@@ -18,6 +18,9 @@ $client = new SimpleEmailService(array(
   'aws_secret_access_key' => 'yout_secret...',
   'region' => 'us-west-2' // default is us-east-1
 ));
+
+// method name's first character is must be lower case
+$identities = $client->listIdentities(); // string[]
 ```
 
 ## Available API
@@ -27,3 +30,4 @@ $client = new SimpleEmailService(array(
 * SendEmail
 * GetSendQuota
 * GetSendStatistics
+* GetIdentityVerificationAttributes

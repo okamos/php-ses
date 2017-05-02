@@ -65,7 +65,7 @@ class SimpleEmailService
      *                              parameter is omitted, then all identities will 
      *                              be listed.
      *
-     * @return void
+     * @return string[]
      */
     public function listIdentities($identity_type = '')
     {
@@ -148,6 +148,47 @@ class SimpleEmailService
         if ($res = @file_get_contents($this->_endpoint . '?' . $this->_query_parameters, false, $context)) {
             $xml = simplexml_load_string($res);
             return $xml->ResponseMetadata->RequestId;
+        }
+        throw new Exception(self::ERROR);
+    }
+
+    /**
+     * Get verification status.
+     *
+     * @param string[] $identities List of string. (email or domain)
+     *
+     * @return object {
+     *           ["key"]=> string,
+     *           ["value"]=> {
+     *              ["VerificationToken"]=> string,
+     *              ["VerificationStatus"]=> string
+     *           }
+     *         }
+     */
+    public function getIdentityVerificationAttributes($identities)
+    {
+        $this->_action = 'GetIdentityVerificationAttributes';
+        $this->_method = 'GET';
+
+        $parameters = array();
+
+        $index = 1;
+        if (is_array($identities)) {
+            foreach ($identities as $identity) {
+                if (!(filter_var($identity, FILTER_VALIDATE_EMAIL) || preg_match('/^([a-z\d]+(-[a-z\d]+)*\.)+[a-z]{2,}$/', $identity))) {
+                    throw new Exception('Identity must be EmailAddress or Domain');
+                    return;
+                }
+                $parameters['Identities.member.' . $index] = $identity;
+                $index++;
+            }
+        }
+
+        $this->_generateSignature($parameters);
+        $context = $this->_createStreamContext();
+        if ($res = @file_get_contents($this->_endpoint . '?' . $this->_query_parameters, false, $context)) {
+            $xml = simplexml_load_string($res);
+            return $xml->GetIdentityVerificationAttributesResult->VerificationAttributes->entry;
         }
         throw new Exception(self::ERROR);
     }
