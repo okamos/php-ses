@@ -29,6 +29,7 @@ class sesTest extends TestCase
         $region = getenv('REGION');
 
         $this->_email = 'okamos@okamos.com';
+        $this->_domain = 'okamos.com';
         $this->_client = new SimpleEmailService(
             array(
                 'aws_access_key_id' => $aws_key,
@@ -54,6 +55,16 @@ class sesTest extends TestCase
     {
         $requestId = $this->_client->deleteIdentity($this->_email);
         $this->assertNotEmpty($requestId);
+    }
+
+    public function testGetIdentityVerificationAttributes()
+    {
+        $entries = $this->_client->getIdentityVerificationAttributes(
+            [$this->_domain]
+        );
+        $this->assertEquals(
+            'Success', $entries->entry[0]->value->VerificationStatus
+        );
     }
 }
 ?>

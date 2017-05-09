@@ -157,12 +157,16 @@ class SimpleEmailService
      *
      * @param string[] $identities List of string. (email or domain)
      *
-     * @return object {
-     *           ["key"]=> string,
-     *           ["value"]=> {
-     *              ["VerificationToken"]=> string,
-     *              ["VerificationStatus"]=> string
-     *           }
+     * @return SimpleXMLElement {
+     *           ["entry"]=> array(
+     *             object {
+     *               ["key"]=> string,
+     *               ["value"]=> {
+     *                 ["VerificationToken"]=> string,
+     *                 ["VerificationStatus"]=> string
+     *               }
+     *             }
+     *           )
      *         }
      */
     public function getIdentityVerificationAttributes($identities)
@@ -189,7 +193,7 @@ class SimpleEmailService
         $context = $this->_createStreamContext();
         if ($res = @file_get_contents($this->_endpoint . '?' . $this->_query_parameters, false, $context)) {
             $xml = simplexml_load_string($res);
-            return $xml->GetIdentityVerificationAttributesResult->VerificationAttributes->entry;
+            return $xml->GetIdentityVerificationAttributesResult->VerificationAttributes;
         }
         throw new Exception(self::ERROR);
     }
@@ -262,7 +266,11 @@ class SimpleEmailService
     /**
      * Get your AWS account's sending limits.
      *
-     * @return double
+     * @return SimpleXMLElement {
+     *           ["Max24HourSend"]=> string,
+     *           ["SentLast24Hours"]=> string,
+     *           ["MaxSendRate"]=> string
+     *         }
      */
     public function getSendQuota()
     {
@@ -282,7 +290,13 @@ class SimpleEmailService
     /**
      * Get SES sending statistics.
      *
-     * @return array
+     * @return SimpleXMLElement {
+     *           ["Complaints"]=> string,
+     *           ["Rejects"]=> string,
+     *           ["Bounces"]=> string,
+     *           ["DeliveryAttempts"]=> string,
+     *           ["Timestamp"]=> string
+     *         }
      */
     public function getSendStatistics()
     {
