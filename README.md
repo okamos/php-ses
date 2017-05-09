@@ -3,6 +3,13 @@
 [![license](https://img.shields.io/github/license/okamos/php-ses.svg)]()  
 php-ses is a PHP library for Amazon's Simple Email Service's REST API [Amazon SES](https://aws.amazon.com/ses/)
 
+## Installation
+Install via [Composer](https://getcomposer.org/)
+
+```bash
+composer require okamos/php-ses
+```
+
 ## Getting started
 To get started you need to require ses.php
 
