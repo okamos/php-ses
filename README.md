@@ -7,17 +7,29 @@ php-ses is a PHP library for Amazon's Simple Email Service's REST API [Amazon SE
 To get started you need to require ses.php
 
 ```php
+<php?
 require_once('vendor/ses.php');
 ```
 
 This library need your AWS access key id and aws secret access key.
 
 ```php
-$ses = new SimpleEmailService(array(
-  'aws_access_key_id' => 'AKI...',
-  'aws_secret_access_key' => 'yout_secret...',
-  'region' => 'us-west-2' // default is us-east-1
-));
+$ses = new SimpleEmailService(
+    array(
+        'aws_access_key_id' => 'AKI...',
+        'aws_secret_access_key' => 'yout_secret...',
+        'region' => 'us-west-2' // default is us-east-1
+    )
+);
+
+// if you can't use verification of SSL certificate
+$ses = new SimpleEmailService(
+    array(
+        'aws_access_key_id' => 'AKI...',
+        'aws_secret_access_key' => 'yout_secret...',
+        'region' => 'us-west-2' // default is us-east-1
+    ), false
+);
 
 // method name's first character is must be lower case
 $identities = $ses->listIdentities(); // string[]
