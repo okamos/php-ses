@@ -7,7 +7,7 @@ install: composer install
 cache:
   directories: vendor
 script:
-  - phpunit --bootstrap vendor/autoload.php tests
+  - vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 env:
   global:
       - secure: "j7M4pqV+RNvyQXtalfXOE086ZEnO05rsEorBYiR6SS0ltfk+fO+2PCb0bqOVCD5FQIr1d0+tMRMgZzQqA0dtvXZXeYd/EfH50ApsY3QXKPKG2tKietWjGSanBpeXoeVBKP4oNWKOz9e59T3psvjSTZYJ34CbNiB3kyA5A+gJXzN6KTUjw6HyxxEt7cX1iFW0yQfhMPg7q86lY+PY9EkXywi+aBGJh6a4X/MTh/krzVX4xE+yuKlrSBgy0OGK4yOocqVMcjX+rGF+s7db0F9+tHSvYofGzHMuj8DsNZ1frpyjcMJ+8I5Bi8titqr8316nnCcX5e7XsScTsHijH70A4YNal9171YK4LdyaZcXZIvdU1kRTmnY4vJd8Gt3/SnGSYirpeFTuEzp+xE5ttEjFBMH9X79JPd4qQvXEGEIYLH4nKKVzZzbiMuJUTT2hkVzDh9I4ZjOYxmgdrHDdMDw7857vZLBS2iMP1B0ho/TP3QniM6T8H8/7pQOHCzX4au1v4dfokRDhhS6F/inM/nygtpb1JR/KD2n7MQzS/y7vDpMaK2eE2DyRGkVy77SVrgJ29FD7YwzLPAP2m/UcHYLR6U9oiLmGSuXByElvVivpXvkA7lBo6dj6fMrUglfNIVBurELRCn77vRPGDtCYtSLYVA9bmmGktUOP+wTe16ha0KU="
