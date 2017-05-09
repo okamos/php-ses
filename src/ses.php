@@ -51,9 +51,6 @@ class SimpleEmailService
         $this->_host = self::SERVICE . '.' . $this->_region . '.' . self::DOMAIN;
         $this->_endpoint = 'https://' . self::SERVICE . '.' . $this->_region . '.' . self::DOMAIN;
 
-        $this->_amz_date = gmdate('Ymd\THis\Z');
-        $this->_date = gmdate('Ymd');
-
         $this->ssl_verify = $ssl_verify_peer;
     }
 
@@ -71,6 +68,7 @@ class SimpleEmailService
     {
         $this->_action = 'ListIdentities';
         $this->_method = 'GET';
+        $this->_refreshDate();
 
         if (!preg_match('/^(EmailAddress|Domain|)$/', $identity_type)) {
             throw new Exception('IdentityType must be EmailAddress or Domain');
@@ -102,6 +100,7 @@ class SimpleEmailService
     {
         $this->_action = 'VerifyEmailIdentity';
         $this->_method = 'GET';
+        $this->_refreshDate();
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new Exception('Invalid email');
@@ -133,6 +132,7 @@ class SimpleEmailService
     {
         $this->_action = 'DeleteIdentity';
         $this->_method = 'GET';
+        $this->_refreshDate();
 
         if (!(filter_var($identity, FILTER_VALIDATE_EMAIL) || preg_match('/^([a-z\d]+(-[a-z\d]+)*\.)+[a-z]{2,}$/', $identity))) {
             throw new Exception('Identity must be EmailAddress or Domain');
@@ -169,6 +169,7 @@ class SimpleEmailService
     {
         $this->_action = 'GetIdentityVerificationAttributes';
         $this->_method = 'GET';
+        $this->_refreshDate();
 
         $parameters = array();
 
@@ -208,6 +209,7 @@ class SimpleEmailService
     {
         $this->_action = 'SendEmail';
         $this->_method = 'POST';
+        $this->_refreshDate();
 
         $parameters = array(
             'Message.Body.Text.Data' => $assets['body'],
@@ -266,6 +268,7 @@ class SimpleEmailService
     {
         $this->_action = 'GetSendQuota';
         $this->_method = 'GET';
+        $this->_refreshDate();
 
         $this->_generateSignature();
         $context = $this->_createStreamContext();
@@ -285,6 +288,7 @@ class SimpleEmailService
     {
         $this->_action = 'GetSendStatistics';
         $this->_method = 'GET';
+        $this->_refreshDate();
 
         $this->_generateSignature();
         $context = $this->_createStreamContext();
@@ -332,6 +336,17 @@ class SimpleEmailService
     }
 
     /**
+     *  Refresh amzdate and date
+     *
+     *  @return void
+     */
+    private function _refreshDate()
+    {
+        $this->_amz_date = gmdate('Ymd\THis\Z');
+        $this->_date = gmdate('Ymd');
+    }
+
+    /**
      * Signing AWS Requests with Signature Version 4
      *
      * @param array $parameters It contains request parameters.
@@ -342,6 +357,7 @@ class SimpleEmailService
      */
     private function _generateSignature($parameters = array())
     {
+        $this->_headers = [];
         $canonical_uri = '/';
 
         $parameters['Action'] = $this->_action;
