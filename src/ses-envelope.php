@@ -318,7 +318,7 @@ class SimpleEmailServiceEnvelope
         }
         // if name matched encode Base64
         if (preg_match("/(.*)<(.*)>/", $val, $match)) {
-            return '=?' . $this->_charset . '?B?' . base64_encode($match[1]) . '?= <' . $regs[2] . '>';
+            return '=?' . $this->_charset . '?B?' . base64_encode($match[1]) . '?= <' . $match[2] . '>';
         }
         return $val;
     }
