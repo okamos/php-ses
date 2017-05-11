@@ -31,11 +31,9 @@ class sesTest extends TestCase
         $this->_email = 'okamos@okamos.com';
         $this->_domain = 'okamos.com';
         $this->_client = new SimpleEmailService(
-            array(
-                'aws_access_key_id' => $aws_key,
-                'aws_secret_access_key' => $aws_secret,
-                'region' => $region
-            )
+            $aws_key,
+            $aws_secret,
+            $region
         );
     }
 
