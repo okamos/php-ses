@@ -37,16 +37,17 @@ class SimpleEmailService
      * It is required aws_access_key_id and aws_secret_access_key.
      * Defaults verification of SSL certificate used.
      *
-     * @param array   $credentials     It remains aws access_key_id and
+     * @param string  $access_key      AWS access_key_id.
+     * @param string  $secret_key      AWS secret_access_key.
+     * @param string  $region          AWS region. default us-east-1.
      *                                 aws_secret_access_key, region.
      * @param boolean $ssl_verify_peer Require verification of peer name.
      */
-    public function __construct($credentials = array(), $ssl_verify_peer = true)
+    public function __construct($access_key, $secret_key, $region = 'us-east-1', $ssl_verify_peer = true)
     {
-        $this->_aws_key = $credentials['aws_access_key_id'];
-        $this->_aws_secret = $credentials['aws_secret_access_key'];
-        // default is us-east-1
-        $this->_region = $credentials['region'] ? $credentials['region'] : 'us-east-1';
+        $this->_aws_key = $access_key;
+        $this->_aws_secret = $secret_key;
+        $this->_region = $region;
 
         $this->_host = self::SERVICE . '.' . $this->_region . '.' . self::DOMAIN;
         $this->_endpoint = 'https://' . self::SERVICE . '.' . $this->_region . '.' . self::DOMAIN;
@@ -201,35 +202,23 @@ class SimpleEmailService
     /**
      * Send the email to some specified addresses.
      *
-     * @param array $assets "to", "cc", "bcc" are destination for this email.
-     *                      "body" is the message to be sent.
-     *                      "subject" is the subject of the message.
+     * @param SimpleEmailServiceEnvelope $envelope Instance of
+     *                                   SimpleEmailServiceEnvelope class.
      *
-     * @return string.
+     * @return string RequestId.
      *
      * @todo Send raw message.
      */
-    public function sendEmail($assets = array())
+    public function sendEmail($envelope)
     {
-        $this->_action = 'SendEmail';
+        if (!$envelope->validate()) {
+            return false;
+        }
+
+        $parameters = $envelope->buildParameters();
+        $this->_action = $envelope->action;
         $this->_method = 'POST';
         $this->_refreshDate();
-
-        $parameters = array(
-            'Message.Body.Text.Data' => $assets['body'],
-            'Message.Subject.Data' => $assets['subject'],
-            'Source' => $assets['from']
-        );
-
-        if (isset($asset['to'])) {
-            $this->addAddresses($assets['to']);
-        }
-        if (isset($asset['cc'])) {
-            $this->addAddresses($assets['cc'], 'cc');
-        }
-        if (isset($asset['bcc'])) {
-            $this->addAddresses($assets['bcc'], 'bcc');
-        }
 
         $this->_generateSignature($parameters);
         $context = $this->_createStreamContext();
@@ -240,28 +229,6 @@ class SimpleEmailService
         throw new Exception(self::ERROR);
     }
 
-    /**
-     * Add To: Cc: Bcc: to the destination for a email.
-     *
-     * @param string[] $addresses   List of emails.
-     * @param string   $destination Destination type. Possible values are "to" and
-     *                              "cc", "bcc".
-     *
-     * @return void
-     */
-    public function addAddresses($addresses, $destination = 'to')
-    {
-        $address_index = 1;
-        if (is_string($addresses)) {
-            $parameters['Destination.' . $destination . 'Addresses.member.' . $address_index] = $addresses;
-        }
-        if (is_array($addresses)) {
-            foreach ($addresses as $address) {
-                $parameters['Destination.' . $destination . 'Addresses.member.' . $address_index] = $address;
-                $address_index++;
-            }
-        }
-    }
 
     /**
      * Get your AWS account's sending limits.

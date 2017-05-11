@@ -15,27 +15,23 @@ To get started you need to require ses.php
 
 ```php
 <php?
-require_once('vendor/ses.php');
+require_once('vendor/autoload.php');
 ```
 
 This library need your AWS access key id and aws secret access key.
 
 ```php
 $ses = new SimpleEmailService(
-    array(
-        'aws_access_key_id' => 'AKI...',
-        'aws_secret_access_key' => 'yout_secret...',
-        'region' => 'us-west-2' // default is us-east-1
-    )
+    'AKI...', // your AWS access key id
+    'your_secret...', // your AWS secret access key
+    'us-west-2' // AWS region, default is us-east-1
 );
 
 // if you can't use verification of SSL certificate
 $ses = new SimpleEmailService(
-    array(
-        'aws_access_key_id' => 'AKI...',
-        'aws_secret_access_key' => 'yout_secret...',
-        'region' => 'us-west-2' // default is us-east-1
-    ), false
+    'AKI...', // your AWS access key id
+    'your_secret...', // your AWS secret access key
+    'us-west-2' // AWS region, default is us-east-1
 );
 
 // method name's first character is must be lower case
@@ -79,7 +75,7 @@ Get verification token and status.
 
 ```php
 $identities = [
-    'your-email@exmaple.com',
+    'your-email@example.com',
     'your-domain.com'
 ];
 $entries = $ses->getIdentityVerificationAttributes($identities);
@@ -105,4 +101,44 @@ $data->Rejects // string
 $data->Bounces // string
 $data->DeliveryAttempts // string
 $data->Timestamp // string
+```
+
+Send Email Basic Usage.
+
+```php
+$envelope = new SimpleEmailServiceEnvelope(
+    'your-email@example.com',
+    'Subject',
+    'Message',
+);
+$envelope->AddTo('to@example.com');
+
+$requestId = $ses->sendEmail($envelope);
+```
+
+Send Email with HTML.
+
+```php
+$envelope = new SimpleEmailServiceEnvelope(
+    'your-email@example.com',
+    'Subject',
+    'Message',
+    '<p>Message</p><img src="http://example.com/any/image" alt="image"'
+);
+$envelope->AddTo('to@example.com');
+
+$requestId = $ses->sendEmail($envelope);
+```
+
+Send Email to multiple distinations.
+
+```php
+$envelope = new SimpleEmailServiceEnvelope(
+    'your-email@example.com',
+    'Subject',
+    'Message',
+);
+$envelope->AddTo(['to1@example.com', 'to2@example.com']);
+$envelope->AddCc('cc1@example.com');
+$envelope->AddBcc(['bcc1@example.com'])
 ```
