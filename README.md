@@ -111,7 +111,7 @@ $envelope = new SimpleEmailServiceEnvelope(
     'Subject',
     'Message',
 );
-$envelope->AddTo('to@example.com');
+$envelope->addTo('to@example.com');
 
 $requestId = $ses->sendEmail($envelope);
 ```
@@ -125,7 +125,7 @@ $envelope = new SimpleEmailServiceEnvelope(
     'Message',
     '<p>Message</p><img src="http://example.com/any/image" alt="image"'
 );
-$envelope->AddTo('to@example.com');
+$envelope->addTo('to@example.com');
 
 $requestId = $ses->sendEmail($envelope);
 ```
@@ -138,7 +138,23 @@ $envelope = new SimpleEmailServiceEnvelope(
     'Subject',
     'Message',
 );
-$envelope->AddTo(['to1@example.com', 'to2@example.com']);
-$envelope->AddCc('cc1@example.com');
-$envelope->AddBcc(['bcc1@example.com'])
+$envelope->addTo(['to1@example.com', 'to2@example.com']);
+$envelope->addCc('cc1@example.com');
+$envelope->addBcc(['bcc1@example.com'])
+
+$requestId = $ses->sendEmail($envelope);
+```
+
+Send Email with attachment file(s).
+
+```php
+$envelope = new SimpleEmailServiceEnvelope(
+    'your-email@example.com',
+    'Subject',
+    'Message',
+);
+$envelope->addTo('to@example.com');
+$envelope->addAttachmentFromFile('filename.svg', '/Your/File/name.svg', 'image/svg');
+
+$requestId = $ses->sendEmail($envelope);
 ```

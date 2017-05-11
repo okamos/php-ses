@@ -122,6 +122,43 @@ class SimpleEmailServiceEnvelope
     }
 
     /**
+     * Add email attachment.
+     *
+     * @param string $name      The name of the file.
+     * @param string $data      The contents.
+     * @param string $mimeType  The specify MIME type.
+     * @param string $contentId Content ID.
+     *
+     * @return void
+     */
+    public function addAttachmentFromData($name, $data, $mimeType = 'application/octet-stream', $contentId = null)
+    {
+        $this->_attachments[] = array(
+            'name' => $name,
+            'mimeType' => $mimeType,
+            'data' => $data,
+            'contentId' => $contentId
+        );
+    }
+
+    /**
+     * Add email attachment via file path
+     *
+     * @param string $name      The name of the file.
+     * @param string $path      Path to the attachment file.
+     * @param string $mimeType  The specify MIME type.
+     * @param string $contentId Content ID.
+     *
+     * @return boolean
+     */
+    public function addAttachmentFromFile($name, $path, $mimeType = 'application/octet-stream', $contentId = null)
+    {
+        if (file_exists($path) && is_file($path) && is_readable($path)) {
+            $this->addAttachmentFromData($name, file_get_contents($path), $mimeType, $contentId);
+        }
+    }
+
+    /**
      * Validates instance.
      * This is used before attempting a SendEmail or SendRawEmail.
      *
@@ -158,6 +195,13 @@ class SimpleEmailServiceEnvelope
     public function buildParameters()
     {
         $params = array();
+
+        if (!empty($this->_attachments)) {
+            $this->action = 'SendRawEmail';
+            $params['RawMessage.Data'] = $this->_buildRaw();
+            return $params;
+        }
+
 
         $i = 1;
         foreach ($this->_to as $to) {
@@ -201,5 +245,81 @@ class SimpleEmailServiceEnvelope
         }
 
         return $params;
+    }
+
+    /**
+     * Build raw envelope.
+     *
+     * @return string
+     */
+    private function _buildRaw()
+    {
+        $boundary = md5(uniqid(rand(), true));
+        $raw_message = 'From: ' . $this->_encodeHeader($this->_source) . "\n";
+        if (!empty($this->_to)) {
+            $raw_message .= 'To: ' . $this->_encodeHeader($this->_to) . "\n";
+        }
+        if (!empty($this->_cc)) {
+            $raw_message .= 'cc: ' . $this->_encodeHeader($this->_cc) . "\n";
+        }
+        if (!empty($this->_bcc)) {
+            $raw_message .= 'Bcc: ' . $this->_encodeHeader($this->_cc) . "\n";
+        }
+        if (!empty($this->_replyTo)) {
+            $raw_message .= 'Reply-To: ' . $this->_encodeHeader($this->_replyTo) . "\n";
+        }
+
+        $raw_message .= 'Subject: =?' . $this->_charset . '?B?' . base64_encode($this->_subject) . "?=\n";
+        $raw_message .= 'MIME-Version: 1.0' . "\n";
+
+        $raw_message .= 'Content-Type: multipart/mixed; boundary="' . $boundary . '"' . "\n"; 
+        $raw_message .= "\n--{$boundary}\n";
+        $raw_message .= 'Content-Type: multipart/alternative; boundary="alt-' . $boundary . '"' . "\n";
+
+        if (strlen($this->_body) > 0) {
+            $raw_message .= "\n--alt-{$boundary}\n";
+            $raw_message .= 'Content-Type: text/plain; charset="' . $this->_charset . '"' . "\n\n";
+            $raw_message .= $this->_body . "\n";
+        }
+
+        if (strlen($this->_htmlBody) > 0) {
+            $raw_message .= "\n--alt-{$boundary}\n";
+            $raw_message .= 'Content-Type: text/html; charset="' . $this->_charset . '"' . "\n\n";
+            $raw_message .= $this->_htmlBody . "\n";
+        }
+        $raw_message .= "\n--alt-{$boundary}--\n";
+
+        foreach ($this->_attachments as $attachment) {
+            $raw_message .= "\n--{$boundary}\n";
+            $raw_message .= 'Content-Type: ' . $attachment['mimeType'] . '; name="' . $attachment['name'] . '"' . "\n";
+            if (!empty($attachment['contentId'])) {
+                $raw_message .= 'Content-ID' . $attachment['contentId'] . "\n";
+            }
+            $raw_message .= 'Content-Transfer-Encoding: base64' . "\n";
+            $raw_message .= "\n" . chunk_split(base64_encode($attachment['data']), 76, "\n") . "\n";
+        }
+
+        $raw_message .= "\n--{$boundary}--\n";
+
+        return base64_encode($raw_message);
+    }
+
+    /**
+     *  Encode header field body, and return it.
+     *
+     * @param string $val Header Field(s) body.
+     *
+     * @return string
+     */
+    private function _encodeHeader($val)
+    {
+        if (is_array($val)) {
+            return join(', ', array_map(array($this, '_encodeHeader'), $val));
+        }
+        // if name matched encode Base64
+        if (preg_match("/(.*)<(.*)>/", $val, $match)) {
+            return '=?' . $this->_charset . '?B?' . base64_encode($match[1]) . '?= <' . $regs[2] . '>';
+        }
+        return $val;
     }
 }
