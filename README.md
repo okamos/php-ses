@@ -79,28 +79,29 @@ $identities = [
     'your-domain.com'
 ];
 $entries = $ses->getIdentityVerificationAttributes($identities);
-$entries->entry[0]->value->VerificationToken; // string(token)
-$entries->entry[1]->value->VerificationStatus; // string(Pending | Success | Failed | TemporaryFailure)
+$entries[0]['email']; // string (email)
+$entries[0]['token']; // string(token)
+$entries[1]['status']; // string(Pending | Success | Failed | TemporaryFailure)
 ```
 
 Get your AWS account's send quota.
 
 ```php
 $sendQuota = $ses->getSendQuota();
-$sendQuota->Max24HourSend // string
-$sendQuota->SentLast24Hours // string
-$sendQuota->MaxSendRate // string
+$sendQuota['Max24HourSend'] // string
+$sendQuota['SentLast24Hours'] // string
+$sendQuota['MaxSendRate'] // string
 ```
 
 Get your sending statistics.
 
 ```php
 $data = $ses->getSendStatistics();
-$data->Complaints // string
-$data->Rejects // string
-$data->Bounces // string
-$data->DeliveryAttempts // string
-$data->Timestamp // string
+$data['Complaints'] // string
+$data['Rejects'] // string
+$data['Bounces'] // string
+$data['DeliveryAttempts'] // string
+$data['Timestamp'] // string
 ```
 
 Send Email Basic Usage.

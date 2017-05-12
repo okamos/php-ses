@@ -162,7 +162,7 @@ class SimpleEmailServiceEnvelope
      * Validates instance.
      * This is used before attempting a SendEmail or SendRawEmail.
      *
-     * @return boolean
+     * @return Error or boolean
      */
     public function validate()
     {
@@ -170,19 +170,19 @@ class SimpleEmailServiceEnvelope
             && count($this->_cc) == 0
             && count($this->_bcc) == 0
         ) {
-            return false;
+            return new SimpleEmailServiceError('Destination');
         }
 
         if (strlen($this->_source) == 0) {
-            return false;
+            return new SimpleEmailServiceError('EmailSource');
         }
 
         if (strlen($this->_subject) == 0) {
-            return false;
+            return new SimpleEmailServiceError('EmailSubject');
         }
 
         if (strlen($this->_body) == 0) {
-            return false;
+            return new SimpleEmailServiceError('EmailBody');
         }
         return true;
     }
