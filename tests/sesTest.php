@@ -16,19 +16,27 @@ use PHPUnit\Framework\TestCase;
 // TODO: test identities count.
 class sesTest extends TestCase
 {
+    protected static $uniqid;
+
+    public static function setUpBeforeClass()
+    {
+        self::$uniqid = uniqid(rand(), true);
+    }
+
     /**
      * Setup AWS Account from ENVIRONMENT variables.
      * * AWS_ACCESS_KEY_ID
      * * AWS_SECRET_ACCESS_KEY
      * * REGION_NAME
      */
-    public function __construct()
+    public function setUp()
     {
         $aws_key = getenv('AWS_ACCESS_KEY_ID');
         $aws_secret = getenv('AWS_SECRET_ACCESS_KEY');
         $region = getenv('REGION');
 
-        $this->_email = 'okamos@okamos.com';
+        $uniqid = self::$uniqid;
+        $this->_email = "okamos-{$uniqid}@okamos.com";
         $this->_domain = 'okamos.com';
         $this->_client = new SimpleEmailService(
             $aws_key,
