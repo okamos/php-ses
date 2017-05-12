@@ -79,9 +79,9 @@ $identities = [
     'your-domain.com'
 ];
 $entries = $ses->getIdentityVerificationAttributes($identities);
-$entries[0]['email']; // string (email)
-$entries[0]['token']; // string(token)
-$entries[1]['status']; // string(Pending | Success | Failed | TemporaryFailure)
+$entries[0]['Email']; // string (email)
+$entries[0]['Token']; // string(token)
+$entries[1]['Status']; // string(Pending | Success | Failed | TemporaryFailure)
 ```
 
 Get your AWS account's send quota.

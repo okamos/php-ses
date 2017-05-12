@@ -162,9 +162,9 @@ class SimpleEmailService
      * @param string[] $identities List of string. (email or domain)
      *
      * @return object[] {
-     *           email  => string,
-     *           token  => string,
-     *           status => string
+     *           Email  => string,
+     *           Token  => string,
+     *           Status => string
      *         }
      */
     public function getIdentityVerificationAttributes($identities)
@@ -194,9 +194,9 @@ class SimpleEmailService
             $ret = array();
             foreach ($entries as $entry) {
                 $ret[] = array(
-                    'email' => (string) $entry->key,
-                    'token' => (string) $entry->value->VerificationToken,
-                    'status' => (string) $entry->value->VerificationStatus
+                    'Email' => (string) $entry->key,
+                    'Token' => (string) $entry->value->VerificationToken,
+                    'Status' => (string) $entry->value->VerificationStatus
                 );
             }
             return $ret;
@@ -239,9 +239,9 @@ class SimpleEmailService
      * Get your AWS account's sending limits.
      *
      * @return object {
-     *           max24HourSend   => string,
-     *           sentLast24Hours => string,
-     *           maxSendRate     => string
+     *           Max24HourSend   => string,
+     *           SentLast24Hours => string,
+     *           MaxSendRate     => string
      *         }
      */
     public function getSendQuota()
@@ -255,8 +255,8 @@ class SimpleEmailService
         if ($res['code'] == 200) {
             $result = $res['body']->GetSendQuotaResult;
             return array(
-                'maxSendRate' => (string) $result->Max24HourSend,
-                'sentLast24Hours' => (string) $result->SentLast24Hours,
+                'MaxSendRate' => (string) $result->Max24HourSend,
+                'SentLast24Hours' => (string) $result->SentLast24Hours,
                 'MaxSendRate' => (string) $result->MaxSendRate
             );
         } else {
@@ -269,11 +269,11 @@ class SimpleEmailService
      * Get SES sending statistics.
      *
      * @return object {
-     *           complaints       => string,
-     *           rejects          => string,
-     *           bounces          => string,
-     *           deliveryAttempts => string,
-     *           timestamp        => string
+     *           Complaints       => string,
+     *           Rejects          => string,
+     *           Bounces          => string,
+     *           DeliveryAttempts => string,
+     *           Timestamp        => string
      *         }
      */
     public function getSendStatistics()
@@ -287,11 +287,11 @@ class SimpleEmailService
         if ($res['code'] == 200) {
             $result = $res['body']->GetSendStatisticsResult->SendDataPoints->member;
             return array(
-                'complaints' => (string) $result->Complaints,
-                'rejects' => (string) $result->Rejects,
-                'bounces' => (string) $result->Bounces,
-                'deliveryAttempts' => (string) $result->DeliveryAttempts,
-                'timestamp' => (string) $result->Timestamp
+                'Complaints' => (string) $result->Complaints,
+                'Rejects' => (string) $result->Rejects,
+                'Bounces' => (string) $result->Bounces,
+                'DeliveryAttempts' => (string) $result->DeliveryAttempts,
+                'Timestamp' => (string) $result->Timestamp
             );
         } else {
             return new SimpleEmailServiceError((string) $res['body']->Error->Code);
