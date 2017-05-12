@@ -69,7 +69,7 @@ class sesTest extends TestCase
             [$this->_domain]
         );
         $this->assertEquals(
-            'Success', $entries->entry[0]->value->VerificationStatus
+            'Success', $entries[0]['Status']
         );
     }
 }
