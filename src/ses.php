@@ -228,6 +228,10 @@ class SimpleEmailService
         $this->_generateSignature($parameters);
         $res = $this->_request();
         if ($res['code'] == 200) {
+            if (isset($res['body']->SendRawEmailResult)) {
+                return (string) $res['body']->SendRawEmailResult->MessageId;
+            }
+            
             return (string) $res['body']->SendEmailResult->MessageId;
         } else {
             return new SimpleEmailServiceError((string) $res['body']->Error->Code);
