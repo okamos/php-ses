@@ -28,6 +28,7 @@ class SimpleEmailService
 
     private $_action;
     private $_method;
+    private $_body;
 
     private $_headers;
     private $_query_parameters;
@@ -345,14 +346,25 @@ class SimpleEmailService
         $parameters['Action'] = $this->_action;
         ksort($parameters);
 
-        $request_parameters = http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
+        $query_parameters = '';
+        $canonical_headers = '';
+        $signed_headers = '';
+        $qp = http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
+        if ($parameters['Action'] == "SendRawEmail" || $parameters['Action'] == "SendEmail") {
+            $this->_body = $qp;
+            $canonical_headers .= 'content-type:' . 'application/x-www-form-urlencoded' . "\n";
+            $signed_headers .= 'content-type;';
+            $this->_headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        } else {
+            $query_parameters = $qp;
+        }
 
-        $canonical_headers = 'host:' . $this->_host . "\n" . 'x-amz-date:' . $this->_amz_date . "\n";
-        $signed_headers = 'host;x-amz-date';
-        $payload_hash = hash('sha256', '');
+        $canonical_headers .= 'host:' . $this->_host . "\n" . 'x-amz-date:' . $this->_amz_date . "\n";
+        $signed_headers .= 'host;x-amz-date';
+        $payload_hash = hash('sha256', $this->_body);
 
         // task1
-        $canonical_request = $this->_method . "\n" . $canonical_uri . "\n" . $request_parameters . "\n" . $canonical_headers . "\n" . $signed_headers . "\n" . $payload_hash;
+        $canonical_request = $this->_method . "\n" . $canonical_uri . "\n" . $query_parameters . "\n" . $canonical_headers . "\n" . $signed_headers . "\n" . $payload_hash;
 
         // task2
         $credential_scope = $this->_date . '/' . $this->_region . '/' . self::SERVICE . '/aws4_request';
@@ -363,7 +375,7 @@ class SimpleEmailService
         $signature = hash_hmac('sha256', $string_to_sign, $signing_key);
         $this->_headers['Authorization'] = self::ALGORITHM . ' Credential=' . $this->_aws_key . '/' . $credential_scope . ', SignedHeaders=' . $signed_headers . ', Signature=' . $signature;
         $this->_headers['x-amz-date'] = $this->_amz_date;
-        $this->_query_parameters = $request_parameters;
+        $this->_query_parameters = $query_parameters;
     }
 
     /**
@@ -376,13 +388,22 @@ class SimpleEmailService
      */
     private function _request()
     {
+        $query = [
+            'headers' => $this->_headers,
+            'http_errors' => false
+        ];
+        if (strlen($this->_body)) {
+            $query['body'] = $this->_body;
+        }
+        $endpoint = $this->_endpoint;
+        if (strlen($this->_query_parameters)) {
+            $endpoint .= '?' . $this->_query_parameters;
+        }
+        
         $res = $this->_client->request(
             $this->_method,
-            $this->_endpoint . '?' . $this->_query_parameters,
-            [
-                'headers' => $this->_headers,
-                'http_errors' => false
-            ]
+            $endpoint,
+            $query,
         );
         return array(
             'code' => $res->getStatusCode(),

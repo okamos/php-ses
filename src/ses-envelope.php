@@ -274,29 +274,31 @@ class SimpleEmailServiceEnvelope
 
         $raw_message .= 'Content-Type: multipart/mixed; boundary="' . $boundary . '"' . "\n"; 
         $raw_message .= "\n--{$boundary}\n";
-        $raw_message .= 'Content-Type: multipart/alternative; boundary="alt-' . $boundary . '"' . "\n";
+        $raw_message .= 'Content-Type: multipart/alternative; boundary="sub_' . $boundary . '"' . "\n";
 
         if (strlen($this->_body) > 0) {
-            $raw_message .= "\n--alt-{$boundary}\n";
+            $raw_message .= "\n--sub_{$boundary}\n";
             $raw_message .= 'Content-Type: text/plain; charset="' . $this->_charset . '"' . "\n\n";
             $raw_message .= $this->_body . "\n";
         }
 
         if (strlen($this->_htmlBody) > 0) {
-            $raw_message .= "\n--alt-{$boundary}\n";
+            $raw_message .= "\n--sub_{$boundary}\n";
             $raw_message .= 'Content-Type: text/html; charset="' . $this->_charset . '"' . "\n\n";
             $raw_message .= $this->_htmlBody . "\n";
         }
-        $raw_message .= "\n--alt-{$boundary}--\n";
+        $raw_message .= "\n--sub_{$boundary}--\n";
 
         foreach ($this->_attachments as $attachment) {
             $raw_message .= "\n--{$boundary}\n";
             $raw_message .= 'Content-Type: ' . $attachment['mimeType'] . '; name="' . $attachment['name'] . '"' . "\n";
+            $raw_message .= 'Content-Description: ' . $attachment['name'] . "\n";
+            $raw_message .= "Content-Disposition: attachment;\n";
             if (!empty($attachment['contentId'])) {
                 $raw_message .= 'Content-ID' . $attachment['contentId'] . "\n";
             }
-            $raw_message .= 'Content-Transfer-Encoding: base64' . "\n";
-            $raw_message .= "\n" . chunk_split(base64_encode($attachment['data']), 76, "\n") . "\n";
+            $raw_message .= "Content-Transfer-Encoding: base64\n";
+            $raw_message .= "\n" . chunk_split(base64_encode($attachment['data']));
         }
 
         $raw_message .= "\n--{$boundary}--\n";
