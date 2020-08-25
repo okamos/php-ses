@@ -5,7 +5,7 @@ on:
 
 jobs:
   test:
-    run-on: ${{ matrix.operating-system }}
+    runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
         operating-system: [ubuntu-18.04, windows-latest, macos-latest]
@@ -23,4 +23,3 @@ jobs:
 
     - name: Composer Install
       run: composer install
-
