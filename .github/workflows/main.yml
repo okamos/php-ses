@@ -1,0 +1,26 @@
+name: Test for AWS SES
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    run-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-18.04, windows-latest, macos-latest]
+        php-version: ['7.2', '7.3', '7.4']
+    name: PHP ${{ matrix.php-version }} Test on ${{ matrix.operating-system }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup PHP with tools
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        tools: composer:v2
+
+    - name: Composer Install
+      run: composer install
+
