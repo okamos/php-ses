@@ -403,7 +403,7 @@ class SimpleEmailService
         $res = $this->_client->request(
             $this->_method,
             $endpoint,
-            $query,
+            $query
         );
         return array(
             'code' => $res->getStatusCode(),
