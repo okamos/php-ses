@@ -39,10 +39,10 @@ $identities = $ses->listIdentities(); // string[]
 
 ## Version Guidance
 
-|Version | PHP Version    |
-|--------|----------------|
-|1.x     | >= 5.6, >= 7.0 |
-|7.x     | >= 7.2         |
+|Version | PHP Version      |
+|--------|------------------|
+|1.x     | >= 5.6, >= 7.0   |
+|7.x     | >= 7.2.5, >= 8.0 |
 
 ## Available API
 * ListIdentities
