@@ -18,7 +18,7 @@ class sesTest extends TestCase
 {
     protected static $uniqid;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$uniqid = uniqid(rand(), true);
     }
@@ -29,7 +29,7 @@ class sesTest extends TestCase
      * * AWS_SECRET_ACCESS_KEY
      * * REGION_NAME
      */
-    public function setUp()
+    public function setUp(): void
     {
         $aws_key = getenv('AWS_ACCESS_KEY_ID');
         $aws_secret = getenv('AWS_SECRET_ACCESS_KEY');
