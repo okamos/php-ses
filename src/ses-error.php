@@ -85,7 +85,7 @@ EOT;
      *
      * @param string $errorCode SES error code
      */
-    public function __construct($errorCode)
+    public function __construct($errorCode, $message)
     {
         $this->code = $errorCode;
         switch ($errorCode) {
@@ -162,5 +162,6 @@ EOT;
             $this->description = 'The email Body: is required.';
             break;
         }
+        $this->message = $message;
     }
 }
