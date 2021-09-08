@@ -90,7 +90,10 @@ class SimpleEmailService
             }
             return $ret;
         } else {
-            return new SimpleEmailServiceError((string) $res['body']->Error->Code);
+            return new SimpleEmailServiceError(
+                (string) $res['body']->Error->Code,
+                (string) $res['body']->Error->Message
+            );
         }
     }
 
@@ -121,7 +124,10 @@ class SimpleEmailService
         if ($res['code'] == 200) {
             return (string) $res['body']->ResponseMetadata->RequestId;
         } else {
-            return new SimpleEmailServiceError((string) $res['body']->Error->Code);
+            return new SimpleEmailServiceError(
+                (string) $res['body']->Error->Code,
+                (string) $res['body']->Error->Message
+            );
         }
     }
 
@@ -153,7 +159,10 @@ class SimpleEmailService
         if ($res['code'] == 200) {
             return (string) $res['body']->ResponseMetadata->RequestId;
         } else {
-            return new SimpleEmailServiceError((string) $res['body']->Error->Code);
+            return new SimpleEmailServiceError(
+                (string) $res['body']->Error->Code,
+                (string) $res['body']->Error->Message
+            );
         }
     }
 
@@ -202,7 +211,10 @@ class SimpleEmailService
             }
             return $ret;
         } else {
-            return new SimpleEmailServiceError((string) $res['body']->Error->Code);
+            return new SimpleEmailServiceError(
+                (string) $res['body']->Error->Code,
+                (string) $res['body']->Error->Message
+            );
         }
     }
 
@@ -235,7 +247,10 @@ class SimpleEmailService
             
             return (string) $res['body']->SendEmailResult->MessageId;
         } else {
-            return new SimpleEmailServiceError((string) $res['body']->Error->Code);
+            return new SimpleEmailServiceError(
+                (string) $res['body']->Error->Code,
+                (string) $res['body']->Error->Message
+            );
         }
     }
 
