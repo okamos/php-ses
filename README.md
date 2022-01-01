@@ -44,6 +44,7 @@ $identities = $ses->listIdentities(); // string[]
 |1.x     | >= 5.6, >= 7.0   |
 |7.0.0   | >= 7.2           |
 |^7.3    | >= 7.3, >= 8.0   |
+|^8.0    | >= 8.0           |
 
 ## Available API
 * ListIdentities
