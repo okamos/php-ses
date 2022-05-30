@@ -1,6 +1,5 @@
 name: Test for AWS SES
 on:
-  push:
   pull_request:
 
 jobs:
